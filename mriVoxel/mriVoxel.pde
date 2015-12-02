@@ -6,7 +6,6 @@ float cameraZ ;
 float aspect ;
 float rotSpeed = 0.01;
 float rot = 0;
-int[][][] voxels;
 float yOffset = 0;
 float xOffset = 0;
 
@@ -19,9 +18,6 @@ void setup()
     images[i-1] = loadImage("num/"+i+".jpg");
   }
   imageMode(CENTER);
-  voxels = new int[35][images[0].width][images[0].height];
-  println("voxels are ", voxels.length, voxels[0].length, voxels[0][0].length);
-  readVoxels();
   createCloud();
 
   cameraY = height/2.0;
@@ -59,9 +55,10 @@ void createCloud()
     {
       for (int k = 0; k < 300; k++)
       {
-        if (voxels[i][j][k] > 5) // leave blacks
+        int br = (int)brightness(images[i].pixels[j + k * 550]);
+        if (br > 5) // leave blacks
         {
-          pointCloud.stroke(255, voxels[i][j][k]);
+          pointCloud.stroke(255, br);
           pointCloud.vertex(j, k, i*8);
         }
       }
@@ -74,28 +71,6 @@ void createCloud()
 
 void readVoxels()
 {
-  //for (int i = 0; i < 1; i++)
-  for (int i = 0; i < 34; i++)
-  {
-    for (int j = 0; j < 550; j++)
-    {
-      for (int k = 0; k < 300; k++)
-      {
-        voxels[i][j][k] = images[i].pixels[j + k * 550];
-      }
-    }
-  }
-
-  for (int i = 0; i < 34; i++)
-  {
-    for (int j = 0; j < 550; j++)
-    {
-      for (int k = 0; k < 300; k++)
-      {
-        voxels[i][j][k] = (int)brightness(voxels[i][j][k]);
-      }
-    }
-  }
 }
 
 
