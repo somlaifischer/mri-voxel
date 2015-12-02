@@ -9,7 +9,9 @@ float rot = 0;
 int[][][] voxels;
 float yOffset = 0;
 float xOffset = 0;
-
+float zOffset = 0;
+float tiltX = 0;
+float tiltZ = 0;
 PShape pointCloud = new PShape();
 void setup()
 {
@@ -19,9 +21,9 @@ void setup()
     images[i-1] = loadImage("png/"+i+".png");
   }
   imageMode(CENTER);
-  
+
   cameraY = height/2.0;
-  fov = float(height)/float(width) * PI;
+  fov = float(height)/float(width) * PI / 2;
   cameraZ = cameraY / tan(fov / 2.0);
   aspect = float(width)/float(height);
 }
@@ -31,26 +33,47 @@ void draw()
   background(0);
   tint(255, 80);
   pushMatrix();
-  translate(600, 300, 150);
+  translate(600, 300, 0);
 
-  translate(xOffset, yOffset, mouseX);
+  translate(xOffset, yOffset, zOffset);
 
   rotateY(rot);
+  rotateX(tiltX);
+  rotateZ(tiltZ);
   rot += rotSpeed;
-  showImages();
-
+  if (rot%(PI*2) < 1.2 || rot%(PI*2) > 5.04) showImages(1);
+  else showImages(-1);
 
   popMatrix();
   perspective(fov, aspect, cameraZ/10.0, cameraZ*10.0);
 }
 
 
-void showImages()
+void showImages(int dir)
 {
-  for (int i = 0; i < 34; i++)
+  tint(255, 100);
+  if (dir == 1)
   {
-    image(images[i], 0, 0);
-    translate(0, 0, 10);
+    for (int i = 0; i < 34; i++)
+    {
+      for (int j = 0; j < 6; j++)
+      {
+        image(images[i], 0, 0);
+        translate(0, 0, 2);
+      }
+
+    }
+  } else
+  {
+    translate(0, 0, 10 * 33);
+    for (int i = 33; i >= 0; i--)
+    {
+      for (int j = 0; j < 6; j++)
+      {
+        image(images[i], 0, 0);
+        translate(0, 0, -2);
+      }
+    }
   }
 }
 
@@ -65,13 +88,25 @@ void keyPressed()
   if (key == CODED) 
   {
     if (keyCode == UP) {
-      yOffset -= 10;
+      tiltX -= 0.1;
     } else if (keyCode == DOWN) {
-      yOffset += 10;
+      tiltX += 0.1;
     } else if (keyCode == LEFT) {
-      xOffset -= 10;
+      tiltZ -= 0.1;
     } else if (keyCode == RIGHT) {
-      xOffset += 10;
+      tiltZ += 0.1;
     }
   }
+}
+
+void mouseDragged() 
+{
+  yOffset -= pmouseY-mouseY;
+  xOffset -= pmouseX-mouseX;
+}
+
+void mouseWheel(MouseEvent event) 
+{
+  float e = event.getCount();
+  zOffset += e;
 }
